@@ -41,7 +41,6 @@ local RequireI = Require("SourceLib")
 RequireI:Add("vPrediction", "https://raw.github.com/Hellsing/BoL/master/common/VPrediction.lua")
 RequireI:Add("SOW", "https://raw.github.com/Hellsing/BoL/master/common/SOW.lua")
 RequireI:Add("AoE_Skillshot_Position", "https://gist.githubusercontent.com/FrozenPoet/d45be2dce4f448c78f65/raw/1ee37548baa0f547456388d5a7e921989639e997/AoE_Skillshot_Position.lua")
-RequireI:Add("AutoUpdater", "https://gist.githubusercontent.com/FrozenPoet/e3222c109d9794a4fee0/raw/211f7e9f4b28bcf1d66218cd530eb88287ad53f0/FoxySona.lua")
 RequireI:Check()
 
 if RequireI.downloadNeeded == true then return end
