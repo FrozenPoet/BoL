@@ -4,7 +4,7 @@ if myHero.charName ~= "Sona" then return end
 --[AutoUpdate]--
 local version = 0.03
 local AUTOUPDATE = true
-local SCRIPT_NAME = "Foxy Sona"
+local SCRIPT_NAME = "FoxySona"
 --========--
 local SOURCELIB_URL = "https://raw.github.com/TheRealSource/public/master/common/SourceLib.lua"
 local SOURCELIB_PATH = LIB_PATH.."SourceLib.lua"
@@ -89,7 +89,6 @@ local LastSkin = 0
 --[OnTick]--
 function OnTick()
 	if myHero.dead then return end
-	PrintChat("SUCCESS")
 	QREADY = (myHero:CanUseSpell(_Q) == READY)
 	EREADY = (myHero:CanUseSpell(_E) == READY)
 	WREADY = (myHero:CanUseSpell(_W) == READY)
@@ -363,3 +362,4 @@ function _checkLftick()
 		_G.DrawCircle = DrawCircle2
 	end
 end
+
