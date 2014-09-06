@@ -1,8 +1,8 @@
---0.02 Initial Release Version
+--0.03 Initial Release Version
 
 if myHero.charName ~= "Sona" then return end
 --[AutoUpdate]--
-local version = 0.01
+local version = 0.03
 local AUTOUPDATE = true
 local SCRIPT_NAME = "Foxy Sona"
 --========--
@@ -36,6 +36,9 @@ end
 
 if DOWNLOADING_SOURCELIB then print("Downloading required libraries, please wait...") return end
 
+if AUTOUPDATE then
+	 SourceUpdater(SCRIPT_NAME, version, "raw.github.com", "/FrozenPoet/BoL/master/"..SCRIPT_NAME..".lua", SCRIPT_PATH .. GetCurrentEnv().FILE_NAME, "/FrozenPoet/BoL/master/version/"..SCRIPT_NAME..".version"):CheckUpdate()
+end
 
 local RequireI = Require("SourceLib")
 RequireI:Add("vPrediction", "https://raw.github.com/Hellsing/BoL/master/common/VPrediction.lua")
@@ -45,6 +48,24 @@ RequireI:Check()
 
 if RequireI.downloadNeeded == true then return end
 --========--
+local checkMe = nil
+local checkAllies = nil
+
+function OnGainBuff(myHero, buff)
+	checkMe = Menu.wheal.healme
+	checkAllies = Menu.wheal.healallies
+	if buff.name == "Recall" then
+		Menu.wheal.healme = false
+		Menu.wheal.healallies = false
+	end
+end
+
+function OnLoseBuff(myHero, buff)
+	if buff.name == "Recall" then
+		if checkMe then Menu.wheal.healme = true end
+		if checkAllies then Menu.wheal.healallies = true end
+	end
+end
 
 --[OnLoad]--
 function OnLoad()
@@ -68,7 +89,7 @@ local LastSkin = 0
 --[OnTick]--
 function OnTick()
 	if myHero.dead then return end
-	
+	PrintChat("SUCCESS")
 	QREADY = (myHero:CanUseSpell(_Q) == READY)
 	EREADY = (myHero:CanUseSpell(_E) == READY)
 	WREADY = (myHero:CanUseSpell(_W) == READY)
