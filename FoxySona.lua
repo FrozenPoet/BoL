@@ -1,8 +1,11 @@
---0.03 Initial Release Version
+--Version 0.01 - Initial Release (Beta)
+--Version 0.02 - Smart Recall Added [Now it won't interrupt recalling with W]
+--Version 0.03 - Automatic Updater has been added [To update: Press F9 two times]
+--Version 0.04 - Now Smart Recall works with the Recall Mastery too
 
 if myHero.charName ~= "Sona" then return end
 --[AutoUpdate]--
-local version = 0.03
+local version = 0.04
 local AUTOUPDATE = true
 local SCRIPT_NAME = "FoxySona"
 --========--
@@ -54,14 +57,14 @@ local checkAllies = nil
 function OnGainBuff(myHero, buff)
 	checkMe = Menu.wheal.healme
 	checkAllies = Menu.wheal.healallies
-	if buff.name == "Recall" then
+	if (buff.name:find("Recall") ~= nil) then
 		Menu.wheal.healme = false
 		Menu.wheal.healallies = false
 	end
 end
 
 function OnLoseBuff(myHero, buff)
-	if buff.name == "Recall" then
+	if (buff.name:find("Recall") ~= nil) then
 		if checkMe then Menu.wheal.healme = true end
 		if checkAllies then Menu.wheal.healallies = true end
 	end
@@ -362,4 +365,3 @@ function _checkLftick()
 		_G.DrawCircle = DrawCircle2
 	end
 end
-
