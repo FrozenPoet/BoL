@@ -6,7 +6,7 @@
 
 if myHero.charName ~= "Sona" then return end
 --[AutoUpdate]--
-local version = 0.04
+local version = 0.05
 local AUTOUPDATE = true
 local SCRIPT_NAME = "FoxySona"
 local VIP_User
