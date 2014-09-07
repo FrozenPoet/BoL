@@ -3,6 +3,7 @@
 --Version 0.03 - Automatic Updater has been added [To update: Press F9 two times]
 --Version 0.04 - Now Smart Recall works with the Recall Mastery too
 --Version 0.05 - Added VIP check for free users (prevents bugs from popping up)
+--Version 0.06 - Added VPrediction Support
 
 if myHero.charName ~= "Sona" then return end
 --[AutoUpdate]--
@@ -21,6 +22,21 @@ local script = string.dump(
  
     end
 )
+
+--[[VPrediction]]
+local VP
+
+local Menu = nil
+
+local SelectedTarget = nil
+
+local DamageToHeros = {}
+local lastrefresh = 0
+
+local ComboMode
+local _ST, _TF  = 1,2
+
+local LastChampionSpell = {}
  
 buff=""
 for v=1,string.len(script) do --Convert our string into a hex string.
@@ -77,7 +93,7 @@ function OnLoad()
 	--[Target]--
 	targetselq = TargetSelector(TARGET_LESS_CAST_PRIORITY, 650, DAMAGE_MAGIC)
 	targetselr = TargetSelector(TARGET_LESS_CAST_PRIORITY, 900, DAMAGE_MAGIC)
-
+	VP = VPrediction()
 	_scriptMenu()
 	PrintChat("<font color=\"#00FF00\">Foxy Sona by Foxy (MScripting) v<b>"..version.."</b> loaded Successfully! Enjoy :) </font>")	
 end
@@ -127,6 +143,7 @@ end
 
 function _scriptMenu()
 	Menu = scriptConfig("Foxy Sona by Foxy (MScripting)", "sona")
+	VP = VPrediction()
 	--[Hotkeys]--
 	Menu:addSubMenu("Foxy Hotkeys", "hotkeys")
 	Menu.hotkeys:addParam("combo", "Combo Key (Toggle)", SCRIPT_PARAM_ONKEYTOGGLE, false, 84)
@@ -367,4 +384,3 @@ function _checkLftick()
 		_G.DrawCircle = DrawCircle2
 	end
 end
-
