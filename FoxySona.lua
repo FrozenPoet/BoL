@@ -4,10 +4,11 @@
 --Version 0.04 - Now Smart Recall works with the Recall Mastery too
 --Version 0.05 - Added VIP check for free users (prevents bugs from popping up)
 --Version 0.06 - Added VPrediction Support
+--Version 0.07 - Added User Tracker
 
 if myHero.charName ~= "Sona" then return end
 --[AutoUpdate]--
-local version = 0.06
+local version = 0.07
 local AUTOUPDATE = true
 local SCRIPT_NAME = "FoxySona"
 local VIP_User
@@ -81,6 +82,15 @@ function OnGainBuff(myHero, buff)
 	end
 end
 
+function OnBugsplat()
+	UpdateWeb(false, ScriptName, id, HWID)
+end
+
+
+function OnUnload()
+	UpdateWeb(false, ScriptName, id, HWID)
+	end
+
 function OnLoseBuff(myHero, buff)
 	if (buff.name:find("Recall") ~= nil) then
 		if checkMe then Menu.wheal.healme = true end
@@ -88,8 +98,16 @@ function OnLoseBuff(myHero, buff)
 	end
 end
 
+-- Here is one I added to my OnTick to detect the end of the game
+if GetGame().isOver then
+	UpdateWeb(false, ScriptName, id, HWID)
+	-- This is a var where I stop executing what is in my OnTick()
+	startUp = false;
+end
+
 --[OnLoad]--
 function OnLoad()
+		UpdateWeb(true, ScriptName, id, HWID)
 	--[Target]--
 	targetselq = TargetSelector(TARGET_LESS_CAST_PRIORITY, 650, DAMAGE_MAGIC)
 	targetselr = TargetSelector(TARGET_LESS_CAST_PRIORITY, 900, DAMAGE_MAGIC)
@@ -371,6 +389,17 @@ function DrawCircle2(x, y, z, radius, color)
         DrawCircleNextLvl(x, y, z, radius, 1, color, Menu.miscs.lagfree.CL) 
     end
 end
+
+-- These variables need to be near the top of your script so you can call them in your callbacks.
+HWID = Base64Encode(tostring(os.getenv("PROCESSOR_IDENTIFIER")..os.getenv("USERNAME")..os.getenv("COMPUTERNAME")..os.getenv("PROCESSOR_LEVEL")..os.getenv("PROCESSOR_REVISION")))
+-- DO NOT CHANGE. This is set to your proper ID.
+id = 249
+
+-- CHANGE ME. Make this the exact same name as the script you added into the site!
+ScriptName = "Your scriptname here"
+
+-- Thank you to Roach and Bilbao for the support!
+assert(load(Base64Decode("G0x1YVIAAQQEBAgAGZMNChoKAAAAAAAAAAAAAQIDAAAAJQAAAAgAAIAfAIAAAQAAAAQKAAAAVXBkYXRlV2ViAAEAAAACAAAADAAAAAQAETUAAAAGAUAAQUEAAB2BAAFGgUAAh8FAAp0BgABdgQAAjAHBAgFCAQBBggEAnUEAAhsAAAAXwAOAjMHBAgECAgBAAgABgUICAMACgAEBgwIARsNCAEcDwwaAA4AAwUMDAAGEAwBdgwACgcMDABaCAwSdQYABF4ADgIzBwQIBAgQAQAIAAYFCAgDAAoABAYMCAEbDQgBHA8MGgAOAAMFDAwABhAMAXYMAAoHDAwAWggMEnUGAAYwBxQIBQgUAnQGBAQgAgokIwAGJCICBiIyBxQKdQQABHwCAABcAAAAECAAAAHJlcXVpcmUABAcAAABzb2NrZXQABAcAAABhc3NlcnQABAQAAAB0Y3AABAgAAABjb25uZWN0AAQQAAAAYm9sLXRyYWNrZXIuY29tAAMAAAAAAABUQAQFAAAAc2VuZAAEGAAAAEdFVCAvcmVzdC9uZXdwbGF5ZXI/aWQ9AAQHAAAAJmh3aWQ9AAQNAAAAJnNjcmlwdE5hbWU9AAQHAAAAc3RyaW5nAAQFAAAAZ3N1YgAEDQAAAFteMC05QS1aYS16XQAEAQAAAAAEJQAAACBIVFRQLzEuMA0KSG9zdDogYm9sLXRyYWNrZXIuY29tDQoNCgAEGwAAAEdFVCAvcmVzdC9kZWxldGVwbGF5ZXI/aWQ9AAQCAAAAcwAEBwAAAHN0YXR1cwAECAAAAHBhcnRpYWwABAgAAAByZWNlaXZlAAQDAAAAKmEABAYAAABjbG9zZQAAAAAAAQAAAAAAEAAAAEBvYmZ1c2NhdGVkLmx1YQA1AAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAMAAAADAAAAAwAAAAMAAAAEAAAABAAAAAUAAAAFAAAABQAAAAYAAAAGAAAABwAAAAcAAAAHAAAABwAAAAcAAAAHAAAABwAAAAgAAAAHAAAABQAAAAgAAAAJAAAACQAAAAkAAAAKAAAACgAAAAsAAAALAAAACwAAAAsAAAALAAAACwAAAAsAAAAMAAAACwAAAAkAAAAMAAAADAAAAAwAAAAMAAAADAAAAAwAAAAMAAAADAAAAAwAAAAGAAAAAgAAAGEAAAAAADUAAAACAAAAYgAAAAAANQAAAAIAAABjAAAAAAA1AAAAAgAAAGQAAAAAADUAAAADAAAAX2EAAwAAADUAAAADAAAAYWEABwAAADUAAAABAAAABQAAAF9FTlYAAQAAAAEAEAAAAEBvYmZ1c2NhdGVkLmx1YQADAAAADAAAAAIAAAAMAAAAAAAAAAEAAAAFAAAAX0VOVgA="), nil, "bt", _ENV))()
 
 function _checkLf()
 	_G.oldDrawCircle = rawget(_G, 'DrawCircle')
