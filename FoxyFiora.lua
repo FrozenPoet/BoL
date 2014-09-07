@@ -482,6 +482,7 @@ PrintChat("<font color=\"#00FF00\">Foxy Fiora by Foxy (MScripting) v<b>"..versio
 	sow:RegisterAfterAttackCallback(AfterAttack)
 	sow:RegisterOnAttackCallback(OnAttack)
 	Menu()
+	GetFlash()
 end
 
 function OnBugsplat()
