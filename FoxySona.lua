@@ -2,12 +2,14 @@
 --Version 0.02 - Smart Recall Added [Now it won't interrupt recalling with W]
 --Version 0.03 - Automatic Updater has been added [To update: Press F9 two times]
 --Version 0.04 - Now Smart Recall works with the Recall Mastery too
+--Version 0.05 - Added VIP check for free users (prevents bugs from popping up)
 
 if myHero.charName ~= "Sona" then return end
 --[AutoUpdate]--
 local version = 0.04
 local AUTOUPDATE = true
 local SCRIPT_NAME = "FoxySona"
+local VIP_User
 --========--
 local SOURCELIB_URL = "https://raw.github.com/TheRealSource/public/master/common/SourceLib.lua"
 local SOURCELIB_PATH = LIB_PATH.."SourceLib.lua"
@@ -215,7 +217,7 @@ end
 function _harass()
 	if ValidTarget(targetselq.target) then
 		if QREADY and Menu.harassconfig.useQ2 and GetDistance(targetselq.target) <= 650 and (player.mana / player.maxMana > Menu.harassconfig.manaharass) then
-			if Menu.miscs.packt then
+			if VIP_USER and Menu.miscs.packt then
 				Packet("S_CAST", {spellId = _Q}):send()
 			else
 				CastSpell(_Q)
@@ -227,7 +229,7 @@ end
 function _autoharass() 
 	if ValidTarget(targetselq.target) then
 		if QREADY and GetDistance(targetselq.target) <= 650 and (player.mana / player.maxMana > Menu.harassconfig.manaQ) then
-			if Menu.miscs.packt then
+			if VIP_USER and Menu.miscs.packt then
 				Packet("S_CAST", {spellId = _Q}):send()
 			else
 				CastSpell(_Q)
@@ -242,7 +244,7 @@ function _combo()
 			if ValidTarget(target, 1100) then
 				if GetDistance(target) <=650 then
 					if QREADY and Menu.comboconfig.useQ then
-						if Menu.miscs.packt then
+						if VIP_USER and Menu.miscs.packt then
 							Packet("S_CAST", {spellId = _Q}):send()
 						else
 							CastSpell(_Q)
@@ -255,7 +257,7 @@ function _combo()
 
 function _healme() 
 		if WREADY and (player.health / player.maxHealth < Menu.wheal.healratio) then
-			if Menu.miscs.packt then
+			if VIP_USER and Menu.miscs.packt then
 				Packet("S_CAST", {spellId = _W}):send()
 			else
 				CastSpell(_W)
@@ -267,7 +269,7 @@ function _healallies()
 	for h=1, heroManager.iCount do
 		local allies = heroManager:getHero(h)
 		if allies.team == myHero.team and allies.team ~= TEAM_ENEMY and WREADY and (allies.health / allies.maxHealth < Menu.wheal.healalliesratio) and GetDistance(myHero, allies) < 1000 and allies ~= nil then
-			if Menu.miscs.packt then
+			if VIP_USER and Menu.miscs.packt then
 				Packet("S_CAST", {spellId = _W}):send()
 			else
 				CastSpell(_W)
@@ -365,3 +367,4 @@ function _checkLftick()
 		_G.DrawCircle = DrawCircle2
 	end
 end
+
