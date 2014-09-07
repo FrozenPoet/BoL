@@ -12,6 +12,8 @@ local version = 0.07
 local AUTOUPDATE = true
 local SCRIPT_NAME = "FoxySona"
 local VIP_User
+local HWID
+local ID
 --========--
 local SOURCELIB_URL = "https://raw.github.com/TheRealSource/public/master/common/SourceLib.lua"
 local SOURCELIB_PATH = LIB_PATH.."SourceLib.lua"
