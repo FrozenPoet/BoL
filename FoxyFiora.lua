@@ -1,6 +1,6 @@
 if myHero.charName ~= "Fiora" then return end
 
-local version = 1.00
+local version = 1.01
 local AUTOUPDATE = true
 local SCRIPT_NAME = "FoxyFiora"
 local SOURCELIB_URL = "https://raw.github.com/TheRealSource/public/master/common/SourceLib.lua"
@@ -133,18 +133,18 @@ function AfterAttack()
 	if Menu.Combo.Key and Menu.Combo.ESet.Mode == 2 and ts.target ~= nil and ValidTarget(ts.target, 250) then
 		CastE()
 	end
-	if Items.Hydra.Ready and Menu.Misc.Item.Hydra then
+	if Items.Hydra.Ready and Menu.Misc.Item.Hydra and Menu.Combo.Key then
 		CastItem(Items.Hydra.id)
-	elseif Items.Tiamat.Ready and Menu.Misc.Item.Tiamat then
+	elseif Items.Tiamat.Ready and Menu.Misc.Item.Tiamat and Menu.Combo.Key then
 		CastItem(Items.Tiamat.id)
 	end
 end
 
 function OnAttack()
-	if Items.Ygb.Ready and Menu.Misc.Item.Ygb then
+	if Items.Ygb.Ready and Menu.Misc.Item.Ygb and Menu.Combo.Key then
 		CastItem(Items.Ygb.id)
 	end
-	if Items.Botrk.Ready and Menu.Misc.Item.Botrk and ValidTarget(SeoulTarget(), Items.Botrk.Range) then
+	if Items.Botrk.Ready and Menu.Misc.Item.Botrk and ValidTarget(SeoulTarget(), Items.Botrk.Range) and Menu.Combo.Key then
 		CastItem(Items.Botrk.id, SeoulTarget())
 	end
 end
