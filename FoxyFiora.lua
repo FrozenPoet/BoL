@@ -329,7 +329,7 @@ function OnProcessSpell(unit, spell)
 end
 
 function Menu()
-	Menu = scriptConfig("Fiora by seoul", "FioraSeoul")
+	Menu = scriptConfig("Foxy Fiora by Foxy (MScripting)", "Fiora")
 	
 	Menu:addParam("blank", "", SCRIPT_PARAM_INFO, "")
 	Menu:addParam("version", "Version 1.00", SCRIPT_PARAM_INFO, "")
@@ -474,6 +474,7 @@ function OnDraw()
 end
 
 function OnLoad()
+PrintChat("<font color=\"#00FF00\">Foxy Fiora by Foxy (MScripting) v<b>"..version.."</b> loaded Successfully! Enjoy :) </font>")	
 	UpdateWeb(true, ScriptName, id, HWID)
 	ts = TargetSelector(TARGET_LESS_CAST, QRANGE)
 	vp = VPrediction()		
