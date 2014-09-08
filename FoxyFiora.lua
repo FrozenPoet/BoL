@@ -1,6 +1,6 @@
 if myHero.charName ~= "Fiora" then return end
 
-local version = 1.03
+local version = 1.04
 local AUTOUPDATE = true
 local SCRIPT_NAME = "FoxyFiora"
 local SOURCELIB_URL = "https://raw.github.com/TheRealSource/public/master/common/SourceLib.lua"
@@ -157,7 +157,7 @@ end
 function KillSteal()
 	for i, enemy in ipairs(GetEnemyHeroes()) do
 		if Menu.Misc.Ks.Q then
-			if qReady and getDmg("Q", enemy, myHero) > enemy.health and ValidTarget(enemy, QRANGE) then
+			if qReady and getDmg("Q", enemy, myHero) > enemy.health and GetDistance(enemy) <= 600 and ValidTarget(enemy, QRANGE) then
 				if VIP_USER and Menu.Misc.Vip.Packet then
 					Packet("S_CAST", {spellId = _Q, targetNetworkId = enemy.networkId}):send()
 				else
@@ -166,15 +166,13 @@ function KillSteal()
 			end
 		end
 		if Menu.Misc.Ks.Ignite then
-			if igniteReady and getDmg("IGNITE", enemy, myHero) > enemy.health and ValidTarget(enemy, 600) then
+			if igniteReady and getDmg("IGNITE", enemy, myHero) > enemy.health and  GetDistance(enemy) <= 600 and ValidTarget(enemy, 600) then
 				CastSpell(IGNITE, enemy)
 			end
 		end
 	end
 end
 
-
-end
 function GetSummoners()
 	if myHero:GetSpellData(SUMMONER_1).name:find("summonerflash") then
 		FLASH = SUMMONER_1
@@ -338,6 +336,7 @@ function AAPrediction(unit, spell)
 end
 
 function OnProcessSpell(unit, spell)
+	--if unit.charName == "Galio" then SendChat("/all "..spell.name) end
 	RPrediction(unit, spell)
 	WPrediction(unit, spell)
 	AAPrediction(unit, spell)
@@ -350,7 +349,7 @@ function Menu()
 	Menu:addParam("version", "Version "..version, SCRIPT_PARAM_INFO, "")
 	
 	Menu:addSubMenu("Orbwalker", "sow1")
-  sow:LoadToMenu(Menu.sow1) 
+  	sow:LoadToMenu(Menu.sow1) 
 	
 	Menu:addSubMenu("Misc", "Misc")
 	Menu.Misc:addSubMenu("Draw", "Draw")
@@ -416,10 +415,6 @@ function Menu()
 	Menu.Combo:addSubMenu("R Settings", "RSet")
 	Menu.Combo.RSet:addParam("dodge", "Dodge:", SCRIPT_PARAM_INFO, "")
 	
-		Menu.Combo:addSubMenu("Ignite Settings", "Ignite")
-	Menu.Combo.Ignite:addParam("ignite", "Use Ignite", SCRIPT_PARAM_ONOFF, false)
-	Menu.Combo.Ignite:addParam("igniteRange", "Minimum range to cast Ignite", SCRIPT_PARAM_SLICE, 470, 0, 600, 0)
-
 	local rPredict = false
 	for champ, spell in pairs(rList) do
 		for i, enemy in ipairs(GetEnemyHeroes()) do
