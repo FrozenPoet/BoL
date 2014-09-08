@@ -6,10 +6,11 @@
 --Version 0.06 - Added VPrediction Support
 --Version 0.07 - Added User Tracker
 --Version 0.08 - User Tracker Bug Fix
+--Version 0.09 - Fixed Healing after Recall and in General
 
 if myHero.charName ~= "Sona" then return end
 --[AutoUpdate]--
-local version = 0.08
+local version = 0.09
 local AUTOUPDATE = true
 local SCRIPT_NAME = "FoxySona"
 local VIP_User
@@ -77,14 +78,17 @@ if RequireI.downloadNeeded == true then return end
 local checkMe = nil
 local checkAllies = nil
 
-function OnGainBuff(myHero, buff)
-	checkMe = Menu.wheal.healme
-	checkAllies = Menu.wheal.healallies
-	if (buff.name:find("Recall") ~= nil) then
+local checkMe = nil
+local checkAllies = nil
+
+function OnGainBuff(unit, buff)
+	if unit.isMe and (buff.name:find("Recall") ~= nil) then
+		checkMe = Menu.wheal.healme
+		checkAllies = Menu.wheal.healallies
 		Menu.wheal.healme = false
 		Menu.wheal.healallies = false
 	end
-end
+	end
 
 function OnBugsplat()
 	UpdateWeb(false, ScriptName, id, HWID)
@@ -95,8 +99,8 @@ function OnUnload()
 	UpdateWeb(false, ScriptName, id, HWID)
 	end
 
-function OnLoseBuff(myHero, buff)
-	if (buff.name:find("Recall") ~= nil) then
+function OnLoseBuff(unit, buff)
+	if unit.isMe and (buff.name:find("Recall") ~= nil) then
 		if checkMe then Menu.wheal.healme = true end
 		if checkAllies then Menu.wheal.healallies = true end
 	end
