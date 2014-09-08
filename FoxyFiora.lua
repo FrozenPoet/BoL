@@ -1,6 +1,6 @@
 if myHero.charName ~= "Fiora" then return end
 
-local version = 1.06
+local version = 1.07
 local AUTOUPDATE = true
 local SCRIPT_NAME = "FoxyFiora"
 local SOURCELIB_URL = "https://raw.github.com/TheRealSource/public/master/common/SourceLib.lua"
@@ -80,7 +80,8 @@ function OnTickCheck()
 	igniteReady = IGNITE and myHero:CanUseSpell(IGNITE) == READY or false
 end
   
-function GodMode() 
+function GodMode()
+	RHelper()
 	if Menu.Combo.Key and Menu.Combo.QSet.Q and ts.target ~= nil and ValidTarget(ts.target, 600) then
 		CastQ() 
 	end
@@ -122,6 +123,16 @@ function CastW()
 		Packet("S_CAST", {spellId = _W}):send()
 	else
 		CastSpell(_W)
+	end
+end
+
+function RHelper()
+	if rReady and Menu.Combo.RSet.Help and IsKeyDown(82) and ValidTarget(SeoulTarget(), 400) then
+		if VIP_USER and Menu.Misc.Vip.Packet then
+			Packet("S_CAST", {spellId = _R, targetNetworkId = SeoulTarget().networkID}):send()
+		else
+			CastSpell(_R, SeoulTarget())
+		end
 	end
 end
 
@@ -432,7 +443,7 @@ function Menu()
 	Menu:addSubMenu("Combo Settings", "Combo")
 	Menu.Combo:addSubMenu("Q Settings", "QSet")
 	Menu.Combo.QSet:addParam("QBuffer", "Q Buffer", SCRIPT_PARAM_SLICE, 325, 0, 600, 0)
-	Menu.Combo.QSet:addParam("Q", "Use Q", SCRIPT_PARAM_ONOFF, true) 
+	Menu.Combo.QSet:addParam("Q", "Use Q", SCRIPT_PARAM_ONOFF, true)
 	Menu.Combo:addSubMenu("W Settings", "WSet")
 	Menu.Combo.WSet:addParam("basic", "Basic Attacks:", SCRIPT_PARAM_INFO, "")
 
@@ -464,6 +475,9 @@ function Menu()
 
 	Menu.Combo:addSubMenu("E Settings", "ESet")
 	Menu.Combo.ESet:addParam("Mode", "E Mode", SCRIPT_PARAM_LIST, 2, {"Never", "After AA", "Always"})
+	Menu.Combo.ESet:addParam("blank", "", SCRIPT_PARAM_INFO, "")
+	Menu.Combo.ESet:addParam("Info", "Info:", SCRIPT_PARAM_INFO, "")
+	Menu.Combo.ESet:addParam("Content", "'After AA' highly suggested", SCRIPT_PARAM_INFO, "")
 	Menu.Combo:addSubMenu("R Settings", "RSet")
 	Menu.Combo.RSet:addParam("dodge", "Dodge:", SCRIPT_PARAM_INFO, "")
 	
@@ -481,7 +495,11 @@ function Menu()
 	end
 	Menu.Combo.RSet:addParam("blank", "", SCRIPT_PARAM_INFO, "")
 	Menu.Combo.RSet:addParam("blank", "If flash is up:", SCRIPT_PARAM_INFO, "")
-	Menu.Combo.RSet:addParam("Flash", "Don't dodge AOE spells", SCRIPT_PARAM_ONOFF, true)
+	Menu.Combo.RSet:addParam("Flash", "Don't dodge AOE spells", SCRIPT_PARAM_ONOFF, false)
+	Menu.Combo.RSet:addParam("blank2", "", SCRIPT_PARAM_INFO, "")
+	Menu.Combo.RSet:addParam("Help", "Ult Helper", SCRIPT_PARAM_ONOFF, false)
+	Menu.Combo.RSet:addParam("UltHelper", "Press 'R' to cast ult on current", SCRIPT_PARAM_INFO, "")
+	Menu.Combo.RSet:addParam("UltHelper2", "target.", SCRIPT_PARAM_INFO, "")
 	
 	Menu.Combo:addParam("Lock", "Attack selected target", SCRIPT_PARAM_ONOFF, true)
 	Menu.Combo:addParam("Key", "Combo Key", SCRIPT_PARAM_ONKEYDOWN, false, 32)
