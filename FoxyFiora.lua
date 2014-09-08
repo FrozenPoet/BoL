@@ -347,7 +347,7 @@ function Menu()
 	Menu = scriptConfig("Foxy Fiora by Foxy (MScripting)", "Fiora")
 	
 	Menu:addParam("blank", "", SCRIPT_PARAM_INFO, "")
-	Menu:addParam("version", "Version 1.00", SCRIPT_PARAM_INFO, "")
+	Menu:addParam("version", "Version "..version, SCRIPT_PARAM_INFO, "")
 	
 	Menu:addSubMenu("Orbwalker", "sow1")
   sow:LoadToMenu(Menu.sow1) 
