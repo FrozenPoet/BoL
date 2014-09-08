@@ -1,6 +1,6 @@
 if myHero.charName ~= "Fiora" then return end
 
-local version = 1.01
+local version = 1.02
 local AUTOUPDATE = true
 local SCRIPT_NAME = "FoxyFiora"
 local SOURCELIB_URL = "https://raw.github.com/TheRealSource/public/master/common/SourceLib.lua"
@@ -8,6 +8,8 @@ local SOURCELIB_PATH = LIB_PATH.."SourceLib.lua"
 local HWID
 local id
 local ID
+local ignite, igniteReady = nil, nil
+local useIgnite = true
 
 
 if FileExist(SOURCELIB_PATH) then
@@ -304,6 +306,41 @@ function PredictVi(unit, spell)
 	end
 end
 
+function CDHandler()
+	if myHero:GetSpellData(SUMMONER_1).name:find("SummonerDot") then
+		ignite = SUMMONER_1
+	elseif myHero:GetSpellData(SUMMONER_2).name:find("SummonerDot") then
+		ignite = SUMMONER_2
+	end
+	igniteReady = (ignite ~= nil and myHero:CanUseSpell(ignite) == READY)
+end
+
+-- Auto Ignite --
+function HealthCheck(unit, HealthValue)
+	if unit.health > (unit.maxHealth * (HealthValue/100)) then 
+		return true
+	else
+		return false
+	end
+end
+
+
+-- Auto Ignite get the maximum range to avoid over kill --
+
+function IgniteKS()
+	if igniteReady then
+		local Enemies = GetEnemyHeroes()
+		for i, val in ipairs(Enemies) do
+			if ValidTarget(val, 600) then
+				if getDmg("IGNITE", val, myHero) > val.health and GetDistance(val) >= Menu.Ads.KS.igniteRange then
+					CastSpell(ignite, val)
+				end
+			end
+		end
+	end
+end
+
+
 function WPrediction(unit, spell)
 	if wReady and not unit.isMe and unit.type == myHero.type and unit.team ~= myHero.team and GetDistance(spell.endPos) < 50 and Menu.Combo.WSet["w"..unit.charName] and wList[unit.charName] ~= nil and (spell.name:find(wList[unit.charName]) ~= nil) then
 		CastW()
@@ -368,6 +405,7 @@ function Menu()
 	Menu.Combo.QSet:addParam("Q", "Use Q", SCRIPT_PARAM_ONOFF, true) 
 	Menu.Combo:addSubMenu("W Settings", "WSet")
 	Menu.Combo.WSet:addParam("basic", "Basic Attacks:", SCRIPT_PARAM_INFO, "")
+
 	
 	local aaPredict = false
 	for i, enemy in ipairs(GetEnemyHeroes()) do
@@ -398,6 +436,10 @@ function Menu()
 	Menu.Combo.ESet:addParam("Mode", "E Mode", SCRIPT_PARAM_LIST, 2, {"Never", "After AA", "Always"})
 	Menu.Combo:addSubMenu("R Settings", "RSet")
 	Menu.Combo.RSet:addParam("dodge", "Dodge:", SCRIPT_PARAM_INFO, "")
+	
+		Menu.Combo:addSubMenu("Ignite Settings", "Ignite")
+	Menu.Combo.Ignite:addParam("ignite", "Use Ignite", SCRIPT_PARAM_ONOFF, false)
+	Menu.Combo.Ignite:addParam("igniteRange", "Minimum range to cast Ignite", SCRIPT_PARAM_SLICE, 470, 0, 600, 0)
 
 	local rPredict = false
 	for champ, spell in pairs(rList) do
@@ -482,7 +524,6 @@ PrintChat("<font color=\"#00FF00\">Foxy Fiora by Foxy (MScripting) v<b>"..versio
 	sow:RegisterAfterAttackCallback(AfterAttack)
 	sow:RegisterOnAttackCallback(OnAttack)
 	Menu()
-	GetFlash()
 end
 
 function OnBugsplat()
