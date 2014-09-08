@@ -1,6 +1,6 @@
 if myHero.charName ~= "Fiora" then return end
 
-local version = 1.02
+local version = 1.03
 local AUTOUPDATE = true
 local SCRIPT_NAME = "FoxyFiora"
 local SOURCELIB_URL = "https://raw.github.com/TheRealSource/public/master/common/SourceLib.lua"
@@ -8,9 +8,6 @@ local SOURCELIB_PATH = LIB_PATH.."SourceLib.lua"
 local HWID
 local id
 local ID
-local ignite, igniteReady = nil, nil
-local useIgnite = true
-
 
 if FileExist(SOURCELIB_PATH) then
 	require("SourceLib")
@@ -31,8 +28,8 @@ RequireI:Add("SOW", "https://raw.github.com/Hellsing/BoL/master/common/SOW.lua")
 RequireI:Check()
 
 if RequireI.downloadNeeded == true then return end
-local qReady, wReady, eReady, rReady, flashReady  = false, false, false, false, false
-local QRANGE, RRANGE, FLASH = 600, 400, nil
+local qReady, wReady, eReady, rReady, flashReady, igniteReady  = false, false, false, false, false, false
+local QRANGE, RRANGE, FLASH, IGNITE = 600, 400, nil, nil
 local lastSkin = 4
 
 wList =	{
@@ -76,13 +73,14 @@ function OnTickCheck()
 	Items.Ygb.Ready = GetInventoryItemIsCastable(Items.Ygb.id)
 	Items.Botrk.Ready = GetInventoryItemIsCastable(Items.Botrk.id)
 	flashReady = FLASH and myHero:CanUseSpell(FLASH) == READY or false
+	igniteReady = (ignite ~= nil and myHero:CanUseSpell(ignite) == READY)
 end
   
 function GodMode() 
-	if Menu.Combo.QSet.Q and ts.target ~= nil and ValidTarget(ts.target, 600) then
+	if Menu.Combo.Key and Menu.Combo.QSet.Q and ts.target ~= nil and ValidTarget(ts.target, 600) then
 		CastQ() 
 	end
-	if Menu.Combo.ESet.Mode == 3 and ts.target ~= nil and ValidTarget(ts.target, 250) then
+	if Menu.Combo.Key and Menu.Combo.ESet.Mode == 3 and ts.target ~= nil and ValidTarget(ts.target, 250) then
 		CastE()
 	end
 end 
@@ -151,31 +149,46 @@ function OnAttack()
 	end
 end
 
-function KsQ()
-	for i, enemy in ipairs(GetEnemyHeroes()) do
-		qDmg = getDmg("Q", enemy, myHero)
-		if qReady and enemy ~= nil and ValidTarget(enemy, 600) and enemy.health < qDmg then
-			if VIP_USER and Menu.Misc.Vip.Packet then
-				Packet("S_CAST", {spellId = _Q, targetNetworkId = ts.target.networkId}):send()
-			else
-				CastSpell(_Q, ts.target)
-			end
-		end
-	end
-end
-
 function KsW(unit)
 	wDmg = getDmg("W", unit, myHero)
 	return unit.health < wDmg and wReady and unit.type == myHero.type and Menu.Misc.Ks.W
 end
 
-function GetFlash()
+function KillSteal()
+	for i, enemy in ipairs(GetEnemyHeroes()) do
+		if Menu.Misc.Ks.Q then
+			if qReady and getDmg("Q", enemy, myHero) > enemy.health and ValidTarget(enemy, QRANGE) then
+				if VIP_USER and Menu.Misc.Vip.Packet then
+					Packet("S_CAST", {spellId = _Q, targetNetworkId = enemy.networkId}):send()
+				else
+					CastSpell(_Q, enemy)
+				end
+			end
+		end
+		if Menu.Misc.Ks.Ignite then
+			if igniteReady and getDmg("IGNITE", enemy, myHero) > enemy.health and ValidTarget(enemy, 600) then
+				CastSpell(IGNITE, enemy)
+			end
+		end
+	end
+end
+
+
+end
+function GetSummoners()
 	if myHero:GetSpellData(SUMMONER_1).name:find("summonerflash") then
 		FLASH = SUMMONER_1
 	elseif myHero:GetSpellData(SUMMONER_2).name:find("summonerflash") then
 		FLASH = SUMMONER_2
 	else
 		FLASH = nil
+	end
+	if myHero:GetSpellData(SUMMONER_1).name:find("summonerdot") then
+		IGNITE = SUMMONER_1
+	elseif myHero:GetSpellData(SUMMONER_2).name:find("summonerdot") then
+		IGNITE = SUMMONER_2
+	else
+		IGNITE = nil
 	end
 end
 
@@ -306,41 +319,6 @@ function PredictVi(unit, spell)
 	end
 end
 
-function CDHandler()
-	if myHero:GetSpellData(SUMMONER_1).name:find("SummonerDot") then
-		ignite = SUMMONER_1
-	elseif myHero:GetSpellData(SUMMONER_2).name:find("SummonerDot") then
-		ignite = SUMMONER_2
-	end
-	igniteReady = (ignite ~= nil and myHero:CanUseSpell(ignite) == READY)
-end
-
--- Auto Ignite --
-function HealthCheck(unit, HealthValue)
-	if unit.health > (unit.maxHealth * (HealthValue/100)) then 
-		return true
-	else
-		return false
-	end
-end
-
-
--- Auto Ignite get the maximum range to avoid over kill --
-
-function IgniteKS()
-	if igniteReady then
-		local Enemies = GetEnemyHeroes()
-		for i, val in ipairs(Enemies) do
-			if ValidTarget(val, 600) then
-				if getDmg("IGNITE", val, myHero) > val.health and GetDistance(val) >= Menu.Ads.KS.igniteRange then
-					CastSpell(ignite, val)
-				end
-			end
-		end
-	end
-end
-
-
 function WPrediction(unit, spell)
 	if wReady and not unit.isMe and unit.type == myHero.type and unit.team ~= myHero.team and GetDistance(spell.endPos) < 50 and Menu.Combo.WSet["w"..unit.charName] and wList[unit.charName] ~= nil and (spell.name:find(wList[unit.charName]) ~= nil) then
 		CastW()
@@ -381,6 +359,7 @@ function Menu()
 	Menu.Misc:addSubMenu("Kill Steal", "Ks")
 	Menu.Misc.Ks:addParam("Q", "Use Q", SCRIPT_PARAM_ONOFF, true)
 	Menu.Misc.Ks:addParam("W", "Use W", SCRIPT_PARAM_ONOFF, true)
+	Menu.Misc.Ks:addParam("Ignite", "Use Ignite", SCRIPT_PARAM_ONOFF, true)
 	Menu.Misc:addSubMenu("Items", "Item")
 	Menu.Misc.Item:addParam("Hydra", "Hydra", SCRIPT_PARAM_ONOFF, true)
 	Menu.Misc.Item:addParam("Tiamat", "Tiamat", SCRIPT_PARAM_ONOFF, true)
@@ -524,6 +503,7 @@ PrintChat("<font color=\"#00FF00\">Foxy Fiora by Foxy (MScripting) v<b>"..versio
 	sow:RegisterAfterAttackCallback(AfterAttack)
 	sow:RegisterOnAttackCallback(OnAttack)
 	Menu()
+	GetSummoners()
 end
 
 function OnBugsplat()
@@ -546,7 +526,7 @@ function OnTick()
 	ts:update()
 	if Menu.Combo.Lock then sow:ForceTarget(GetTarget()) end
 	OnTickCheck()
-	if Menu.Misc.Ks.Q then KsQ() end
-	if Menu.Combo.Key then GodMode() end
+	GodMode()
+	KillSteal()
 	Skin()
 end
