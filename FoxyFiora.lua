@@ -1,6 +1,6 @@
 if myHero.charName ~= "Fiora" then return end
 
-local version = 1.04
+local version = 1.05
 local AUTOUPDATE = true
 local SCRIPT_NAME = "FoxyFiora"
 local SOURCELIB_URL = "https://raw.github.com/TheRealSource/public/master/common/SourceLib.lua"
@@ -49,6 +49,7 @@ rList = {
 	["Amumu"] = "CurseoftheSadMummy",
 	["Annie"] = "InfernalGuardian",
 	--["LeeSin"] = "BlindMonkRKick",
+	["Galio"] = "GalioIdolOfDurand",
 	["Sona"] = "SonaR",
 	["Syndra"] = "syndrar",
 	["Veigar"] = "VeigarPrimordialBurst",
@@ -73,7 +74,7 @@ function OnTickCheck()
 	Items.Ygb.Ready = GetInventoryItemIsCastable(Items.Ygb.id)
 	Items.Botrk.Ready = GetInventoryItemIsCastable(Items.Botrk.id)
 	flashReady = FLASH and myHero:CanUseSpell(FLASH) == READY or false
-	igniteReady = (ignite ~= nil and myHero:CanUseSpell(ignite) == READY)
+	igniteReady = IGNITE and myHero:CanUseSpell(IGNITE) == READY or false
 end
   
 function GodMode() 
@@ -166,7 +167,7 @@ function KillSteal()
 			end
 		end
 		if Menu.Misc.Ks.Ignite then
-			if igniteReady and getDmg("IGNITE", enemy, myHero) > enemy.health and  GetDistance(enemy) <= 600 and ValidTarget(enemy, 600) then
+			if igniteReady and enemy ~= nil and getDmg("IGNITE", enemy, myHero) > enemy.health and GetDistance(enemy) <= 600 and ValidTarget(enemy, 600) then
 				CastSpell(IGNITE, enemy)
 			end
 		end
@@ -222,6 +223,19 @@ function PredictBrand(unit, spell)
 			CastR()
 		end
 		ts.range = 600
+	end
+end
+
+function PredictGalio(unit, spell)
+	if ((Menu.Combo.RSet.Flash and not flashReady) or not Menu.Combo.RSet.Flash) then
+		if GetDistance(unit) < 600 then
+			ts.range = 400
+			ts:update()
+			if ts.target ~= nil and ValidTarget(ts.target, 400) then
+				CastR()
+			end
+			ts.range = 600
+		end
 	end
 end
 
