@@ -1,6 +1,6 @@
 if myHero.charName ~= "Fiora" then return end
 
-local version = 1.02
+local version = 1.06
 local AUTOUPDATE = true
 local SCRIPT_NAME = "FoxyFiora"
 local SOURCELIB_URL = "https://raw.github.com/TheRealSource/public/master/common/SourceLib.lua"
