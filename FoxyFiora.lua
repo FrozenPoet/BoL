@@ -1,6 +1,6 @@
 if myHero.charName ~= "Fiora" then return end
 
-local version = 1.05
+local version = 1.02
 local AUTOUPDATE = true
 local SCRIPT_NAME = "FoxyFiora"
 local SOURCELIB_URL = "https://raw.github.com/TheRealSource/public/master/common/SourceLib.lua"
@@ -48,15 +48,18 @@ wList =	{
 rList = {
 	["Amumu"] = "CurseoftheSadMummy",
 	["Annie"] = "InfernalGuardian",
-	--["LeeSin"] = "BlindMonkRKick",
+	["Ashe"] = "EnchantedCrystalArrow",
+	["LeeSin"] = "BlindMonkRKick",
 	["Galio"] = "GalioIdolOfDurand",
 	["Sona"] = "SonaR",
 	["Syndra"] = "syndrar",
+	["Tristana"] = "BusterShot",
+	["Malphite"] = "UFSlash",
 	["Veigar"] = "VeigarPrimordialBurst",
 	--["Brand"] = "Pyroclasm",
 	--["Malzahar"] = "NetherGrasp",
-	["Malphite"] = "UFSlash",
 	["Vi"] = "ViR"
+	--["Ziggs"] = nil
 	}
 Items = {
 		Hydra  = {id = 3074, Range = 350, Ready = false},
@@ -192,13 +195,15 @@ function GetSummoners()
 end
 
 function PredictAmumu(unit, spell)
-	if GetDistance(unit) < 600 and not flashReady then
-		ts.range = 400
-		ts:update()
-		if ts.target ~= nil and ValidTarget(ts.target, 400) then
-			CastR()
+	if ((Menu.Combo.RSet.Flash and not flashReady) or not Menu.Combo.RSet.Flash) or GetDistance(unit) < 250 then
+		if GetDistance(unit) < 600 and not flashReady then
+			ts.range = 400
+			ts:update()
+			if ts.target ~= nil and ValidTarget(ts.target, 400) then
+				CastR()
+			end
+			ts.range = 600
 		end
-		ts.range = 600
 	end
 end
 
@@ -208,6 +213,29 @@ function PredictAnnie(unit, spell)
 			ts.range = 400
 			ts:update()
 			if ts.target ~= nil and ValidTarget(ts.target, 400) then
+				CastR()
+			end
+			ts.range = 600
+		end
+	end
+end
+
+function PredictAshe(unit, spell)
+	if ((Menu.Combo.RSet.Flash and not flashReady) or not Menu.Combo.RSet.Flash) then
+		local myX = myHero.visionPos.x
+		local myZ = myHero.visionPos.z
+
+		local sonaX = unit.visionPos.x
+		local sonaZ = unit.visionPos.z
+
+		local spellX = spell.endPos.x
+		local spellZ = spell.endPos.z
+
+		local distance = math.abs((myZ-sonaZ)*(sonaX-spellX)-(myX-sonaX)*(sonaZ-spellZ))/math.sqrt((myX-sonaX)*(myX-sonaX)+(myZ-sonaZ)*(myZ-sonaZ))
+		if distance < 102.5 and GetDistance(unit) < 1000 then
+			ts.range = 400
+			ts:update()
+			if ts.target ~= nil and ValidTarget(ts.target) then
 				CastR()
 			end
 			ts.range = 600
@@ -227,7 +255,7 @@ function PredictBrand(unit, spell)
 end
 
 function PredictGalio(unit, spell)
-	if ((Menu.Combo.RSet.Flash and not flashReady) or not Menu.Combo.RSet.Flash) then
+	if ((Menu.Combo.RSet.Flash and not flashReady) or not Menu.Combo.RSet.Flash) or GetDistance(unit) < 250 then
 		if GetDistance(unit) < 600 then
 			ts.range = 400
 			ts:update()
@@ -239,8 +267,8 @@ function PredictGalio(unit, spell)
 	end
 end
 
-function PredictLeeSin(unit,spell)
-	if GetDistance(spell.endPos) < 1 then
+function PredictLeeSin(unit, spell)
+	if GetDistance(spell.endPos) < 100 then
 		ts.range = 400
 		ts:update()
 		if ts.target ~= nil and ValidTarget(ts.target, 400) then
@@ -309,6 +337,17 @@ function PredictSyndra(unit, spell)
 	end
 end
 
+function PredictTristana(unit, spell)
+	if GetDistance(spell.endPos) < 50 then
+		ts.range = 400
+		ts:update()
+		if ts.target ~= nil and ValidTarget(ts.target, 400) then
+			CastR()
+		end
+		ts.range = 600
+	end
+end
+
 function PredictVeigar(unit, spell)
 	if GetDistance(spell.endPos) < 1 then 
 		ts.range = 400
@@ -350,7 +389,6 @@ function AAPrediction(unit, spell)
 end
 
 function OnProcessSpell(unit, spell)
-	--if unit.charName == "Galio" then SendChat("/all "..spell.name) end
 	RPrediction(unit, spell)
 	WPrediction(unit, spell)
 	AAPrediction(unit, spell)
