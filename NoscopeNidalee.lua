@@ -10,7 +10,7 @@
 	v0.7	Reworked Whole Script
 	v0.8    MScript Support & Repo
 	v0.9    Fixed Some little Bugs
-	v0.10   Added Perfect Jump (seong ho is awesome btw <3
+	v0.10   Added Perfect Jump (seong ho is awesome btw <3)
 	v0.11   Fixed more bugs...
 	v0.12   Fixed Q in Combo
 	v0.13   Added Meele Magnet for Cougarform(OP)
